@@ -9,11 +9,11 @@ add_flex_bison_dependency(VerilogScanner VerilogParser)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_executable(Unamed
+add_executable(Confucius
     main.cpp
     driver.cpp
     ${BISON_VerilogParser_OUTPUTS}
     ${FLEX_VerilogScanner_OUTPUTS}
 )
 
-target_link_libraries(Unamed ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
+target_link_libraries(Confucius ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
