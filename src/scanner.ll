@@ -3,7 +3,6 @@
 #include "driver.hpp"
 #include "parser.hpp"
 
-
 #undef yywrap
 #define yywrap() 1
 
@@ -31,7 +30,7 @@ loc.step();
 
 "-"         return yy::Parser::make_MINUS(loc);
 "+"         return yy::Parser::make_PLUS(loc);
-":="        return yy::Parser::make_PLUS(loc);
+":="        return yy::Parser::make_ASSIGN(loc);
 
 {int}       {
                 long n = strtol(yytext, NULL, 10);

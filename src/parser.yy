@@ -1,8 +1,12 @@
 %skeleton "lalr1.cc"
 %require "3.0.4"
+
+/*A setting same with bison's "-d" option*/
 %defines
+
 %define parser_class_name {Parser}
 
+/*These three lines are needed by the feature variant*/
 %define api.token.constructor
 %define api.value.type variant
 %define parse.assert
@@ -15,6 +19,7 @@ class Driver;
 
 %param { Driver& driver }
 
+/*enable location tracking*/
 %locations
 %initial-action {
     @$.begin.filename = @$.end.filename = &driver.file;
@@ -30,10 +35,10 @@ class Driver;
 %define api.token.prefix {TOK_}
 
 %token
-
 END 0 "end of file"
 MINUS "-"
 PLUS  "+"
+ASSIGN ":="
 ;
 
 %token <std::string> IDENTIFIER "identifer"
