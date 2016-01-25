@@ -36,14 +36,9 @@ class Driver;
 
 %token
 END 0 "end of file"
-MINUS "-"
-PLUS  "+"
-ASSIGN ":="
 ;
 
-%token <std::string> IDENTIFIER "identifer"
-%token <int> NUMBER "number"
-%type <int> exp
+%token <std::string> IDENTIFIER "identifier"
 
 %printer {yyoutput << $$; } <*>;
 
@@ -51,21 +46,12 @@ ASSIGN ":="
 
 %start unit;
 
-unit: assignments exp   {driver.result = $2;};
+unit:  
+    ids {};
 
-assignments:
-    %empty              {}
-|   assignments assignment {};
+ids:
+    ids "identifier" {}|{};
 
-assignment:
-    "identifer" ":=" exp { driver.variables[$1] = $3; };
-
-%left "+" "-";
-exp:
-    exp "+" exp { $$ = $1 + $3; }
-|   exp "-" exp { $$ = $1 - $3; }
-|   "identifer" { $$ = driver.variables[$1];}
-|   "number"    { std::swap ($$, $1); };
 %%
 
 void yy::Parser::error(const location_type& l, const std::string &m) {
