@@ -176,7 +176,7 @@ unit:
     ids {};
 
 ids:
-    ids "identifier" { DBVAR($2);}|{};
+    ids "identifier" {}|{};
 
 %%
 
