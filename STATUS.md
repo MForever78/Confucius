@@ -7,12 +7,15 @@ Scanner
 ------
 
 - [x] 2.2 White space
-- [ ] 2.3 Comments
+- [x] 2.3 Comments
 - [ ] 2.4 Operators
 - [x] 2.5 Numbers
-- [ ] 2.6 Strings
+- [x] 2.6 Strings
 - [ ] 2.7 Identifiers, keywords, and system names
     - [x] *simple identifier*
+    - [ ] 2.7.1 Escaped identifiers
+    - [x] 2.7.2 Generated identifiers
+    - [x] 2.7.3 Keywords
 - [ ] 2.8 Attributes
 
 > This bulleted list is constructed by extracting titles of sections and 

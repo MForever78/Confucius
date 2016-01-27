@@ -165,6 +165,7 @@ XOR                 "xor"
 ;
 
 %token <std::string> IDENTIFIER "identifier" STRING "string"
+%token <std::string> NUMBER "number" /* FIXME: should not use std::string */
 
 
 %printer {yyoutput << $$; } <*>;
@@ -173,15 +174,20 @@ XOR                 "xor"
 
 %start unit;
 
+/* FIXME: contain an RR conflict now, should be fixed later */
 unit:  
     ids {}
-|   strings {};
+|   strings {}
+|   numbers {};
 
 ids:
     ids "identifier" {}|{};
 
 strings:
     strings "string" {}|{};
+
+numbers:
+    numbers "number" {}|{};
 
 %%
 

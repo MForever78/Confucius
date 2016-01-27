@@ -19,7 +19,6 @@ static yy::location loc;
 
 /* white space */
 ws          [ \t]
-/* TODO: watch out white spaces in string literals */
 
 /* comments */
 /* sc = single-line comment, bc = block comment */
@@ -28,41 +27,47 @@ bcstart     "/*"
 bcend       "*/"
 %x COMMENT
 
-/* operators */
-/* TODO: maybe no need to define operators here, however in Rule Section */
+/* operators - see in Rules Section */
 
 /* numbers */
-/* TODO: not consider the situation that white space is embedded in number */
 z_digit     [zZ?]
 x_digit     [xX]
 
 hex_digit   {x_digit}|{z_digit}|[0-9a-fA-F]
 oct_digit   {x_digit}|{z_digit}|[0-7]
-bin_digit   {x_digit}|{z_digit||[0-1]
+bin_digit   {x_digit}|{z_digit}|[0-1]
 dec_digit   [0-9]
-dec_digit_pos   [1-9] /* positive digit */
+dec_digit_pos   [1-9]
 
 hex_base    "'"[sS]?[hH]
 oct_base    "'"[sS]?[oO]
 bin_base    "'"[sS]?[bB]
 dec_base    "'"[sS]?[dD]
 
-hex_value   {hex_digit}(_|{hex_digit})+
-oct_value   {oct_digit}(_|{oct_digit})+
-bin_value   {bin_digit}(_|{bin_digit})+
-dec_value   {dec_digit}(_|{dec_digit})+
+hex_value   {hex_digit}(_|{hex_digit})*
+oct_value   {oct_digit}(_|{oct_digit})*
+bin_value   {bin_digit}(_|{bin_digit})*
+dec_value   {dec_digit}(_|{dec_digit})*
 
 /* unsigned number and non-zero unsigned number */
-uns_number  {dec_digit}(_|dec_digit)+
-pos_number  {dec_digit_pos}(_|dec_digit)+
+uns_number  {dec_digit}(_|{dec_digit})*
+pos_number  {dec_digit_pos}{dec_digit}*
+/*  TODO: the original rule in the std 2001 may be wrong, which is
+pos_number  {dec_digit_pos}(_|{dec_digit})* 
 
-size        {pos_number}
+There shall not be any '_' in pos_number, which would be used in size constant
+*/
+
 sign        [+-]
+size        {sign}?{pos_number}
+/* TODO: the original rule in the std 2001 may be wrong, which is
+size        {pos_number}
+*/ 
 
-hex_number  {size}?{hex_base}{hex_value}
-oct_number  {size}?{oct_base}{oct_value}
-bin_number  {size}?{bin_base}{bin_value}
-dec_number  {uns_number}|{size}?{dec_base}{uns_number}|{size}?{dec_base}{x_digit}[_]*|{size}?{dec_base}{z_digit}[_]*
+hex_number  {size}?{hex_base}{ws}*{hex_value}
+oct_number  {size}?{oct_base}{ws}*{oct_value}
+bin_number  {size}?{bin_base}{ws}*{bin_value}
+dec_number  {uns_number}|{size}?{dec_base}{ws}*{uns_number}|{size}?{dec_base}{ws}*{x_digit}[_]*|{size}?{dec_base}{ws}*{z_digit}[_]*
 /* TODO: could we wrap this line under the flex grammar? */
 
 
@@ -133,7 +138,7 @@ loc.step();
                             BEGIN(INITIAL);
                             loc.step();
                             /*DBMSG("leave string literal");*/
-                            DBMSG("scan string \"" << str_literal << "\"");
+                            DBMSG("scan string: \"" << str_literal << "\"");
                             return yy::Parser::make_STRING(str_literal, loc);
                         }
     "\\"[nt\\\x22]      str_literal += yytext; /* escaped \n \t \\ \" */
@@ -274,6 +279,13 @@ loc.step();
                 return yy::Parser::make_IDENTIFIER(yytext, loc);
             }
 
+{number}  {
+                /* FIXME: should return an new symbol type of number*/
+                DBMSG("scan number: " << yytext);
+                return yy::Parser::make_NUMBER(yytext, loc);
+            }
+
+.               DBMSG("scan invalid character: " << yytext);
 <<EOF>>     {
                 return yy::Parser::make_EOF(loc);
             }
