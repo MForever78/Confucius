@@ -74,6 +74,11 @@ number      {dec_number}|{oct_number}|{bin_number}|{hex_number}|{real_number}
 
 /* strings */
 /* TODO: can not simply use definition */
+%{
+std::string str_literal;
+%}
+quote       "\""
+%x STRING
 
 /* identifiers */
 /* TODO: maximum length of identifiers is 1024 characters */
@@ -113,10 +118,32 @@ loc.step();
                             DBMSG("matche single-line comment");
                         }
 
-{ws}+                   loc.step();
+{ws}+          loc.step();
 [\n]+                   loc.lines(yyleng); loc.step();
 
-                        /* keywords list */
+    /* string literal */
+<INITIAL>{quote}        {
+                            BEGIN(STRING);
+                            str_literal = "";
+                            /*DBMSG("enter string literal");*/
+                            /*DBVAR(yytext);*/
+                        }
+<STRING>{
+    {quote}             {
+                            BEGIN(INITIAL);
+                            loc.step();
+                            /*DBMSG("leave string literal");*/
+                            DBMSG("scan string \"" << str_literal << "\"");
+                            return yy::Parser::make_STRING(str_literal, loc);
+                        }
+    "\\"[nt\\\x22]      str_literal += yytext; /* escaped \n \t \\ \" */
+    "\\"[0-7]{1,3}      str_literal += yytext; /* escaped \o \oo \ooo */
+    [^\n\\\x22]*        str_literal += yytext; /* not one of \n, \\, \" */
+    [\n]                /* FIXME: report an error of unterminated string */
+}
+
+
+    /* keywords list */
 "always"                return yy::Parser::make_ALWAYS(loc);
 "and"                   return yy::Parser::make_AND(loc);
 "assign"                return yy::Parser::make_ASSIGN(loc);

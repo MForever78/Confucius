@@ -164,7 +164,8 @@ XNOR                "xnor"
 XOR                 "xor"
 ;
 
-%token <std::string> IDENTIFIER "identifier"
+%token <std::string> IDENTIFIER "identifier" STRING "string"
+
 
 %printer {yyoutput << $$; } <*>;
 
@@ -173,10 +174,14 @@ XOR                 "xor"
 %start unit;
 
 unit:  
-    ids {};
+    ids {}
+|   strings {};
 
 ids:
     ids "identifier" {}|{};
+
+strings:
+    strings "string" {}|{};
 
 %%
 
