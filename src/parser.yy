@@ -105,7 +105,7 @@ NOSHOWCANCELLED     "noshowcancelled"
 NOT                 "not"
 NOTIF0              "notif0"
 NOTIF1              "notif1"
-OR                  "or"
+OR                  "or"            /* FIXME: conflict with operator "or" */
 OUTPUT              "output"
 PARAMETER           "parameter"
 PMOS                "pmos"
@@ -164,6 +164,47 @@ XNOR                "xnor"
 XOR                 "xor"
 ;
 
+/* operators token list - sorted by length */
+%token
+ARITHMETIC_R_SHIFT  ">>>"
+ARITHMETIC_L_SHIFT  "<<<"
+CASE_EQUAL          "==="
+CASE_INEQUAL        "!=="
+LOGIC_R_SHIFT       ">>"
+LOGIC_L_SHIFT       "<<"
+LOGIC_AND           "&&"
+LOGIC_OR            "||"
+LOGIC_EQUAL         "=="
+LOGIC_INEQUAL       "!="
+POWER               "**"
+QUESTION_MARK       "?"
+REDUCTION_NOR       "~|"
+TILDE_HAT           "~^"
+REDUCTION_NAND      "~&"
+HAT_TILDE           "^~"
+GREATER_EQUAL       ">="
+LESS_EQUAL          "<="
+COLON               ":"
+SEMICOLON           ";"
+GREATER             ">"
+LESS                "<"
+HAT                 "^"
+BITWISE_OR          "|"
+BITWISE_AND         "&"
+CURLY_BRACKET_L     "{"
+CURLY_BRACKET_R     "}"
+SQUARE_BRACKET_L    "["
+SQUARE_BRACKET_R    "]"
+BITWISE_NEG         "~"
+PLUS                "+"
+MINUS               "-"
+MUL                 "*"
+DIV                 "/"
+MOD                 "%"
+LOGIC_NEG           "!"
+AT                  "@"
+;
+
 %token <std::string> IDENTIFIER "identifier" STRING "string"
 %token <std::string> NUMBER "number" /* FIXME: should not use std::string */
 
@@ -174,11 +215,16 @@ XOR                 "xor"
 
 %start unit;
 
-/* FIXME: contain an RR conflict now, should be fixed later */
-unit:  
+unit:
+    scanner_gnnng_test {}; /* TODO: comment this line when finish */
+
+/* FIXME: this test contains an RR conflict now, should be fixed later */
+scanner_gnnng_test:
     ids {}
 |   strings {}
-|   numbers {};
+|   numbers {}
+|   keywords {}
+|   operators {};
 
 ids:
     ids "identifier" {}|{};
@@ -188,6 +234,177 @@ strings:
 
 numbers:
     numbers "number" {}|{};
+
+keywords:
+    keywords keyword { DBMSG("scan keyword: N/A");} | {};
+
+keyword:
+    "always"
+|   "and"
+|   "assign"
+|   "automatic"
+|   "begin"
+|   "buf"
+|   "bufif0"
+|   "bufif1"
+|   "case"
+|   "casex"
+|   "casez"
+|   "cell"
+|   "cmos"
+|   "config"
+|   "deassign"
+|   "default"
+|   "defparam"
+|   "design"
+|   "disable"
+|   "edge"
+|   "else"
+|   "end"
+|   "endcase"
+|   "endconfig"
+|   "endfunction"
+|   "endgenerate"
+|   "endmodule"
+|   "endprimitive"
+|   "endspecify"
+|   "endtable"
+|   "endtask"
+|   "event"
+|   "for"
+|   "force"
+|   "forever"
+|   "fork"
+|   "function"
+|   "generate"
+|   "genvar"
+|   "highz0"
+|   "highz1"
+|   "if"
+|   "ifnone"
+|   "incdir"
+|   "include"
+|   "initial"
+|   "inout"
+|   "input"
+|   "instance"
+|   "integer"
+|   "join"
+|   "large"
+|   "liblist"
+|   "library"
+|   "localparam"
+|   "macromodule"
+|   "medium"
+|   "module"
+|   "nand"
+|   "negedge"
+|   "nmos"
+|   "nor"
+|   "noshowcancelled"
+|   "not"
+|   "notif0"
+|   "notif1"
+|   "or"
+|   "output"
+|   "parameter"
+|   "pmos"
+|   "posedge"
+|   "primitive"
+|   "pull0"
+|   "pull1"
+|   "pulldown"
+|   "pullup"
+|   "pulsestyle_onevent"
+|   "pulsestyle_ondetect"
+|   "rcmos"
+|   "real"
+|   "realtime"
+|   "reg"
+|   "release"
+|   "repeat"
+|   "rnmos"
+|   "rpmos"
+|   "rtran"
+|   "rtranif0"
+|   "rtranif1"
+|   "scalared"
+|   "showcancelled"
+|   "signed"
+|   "small"
+|   "specify"
+|   "specparam"
+|   "strong0"
+|   "strong1"
+|   "supply0"
+|   "supply1"
+|   "table"
+|   "task"
+|   "time"
+|   "tran"
+|   "tranif0"
+|   "tranif1"
+|   "tri"
+|   "tri0"
+|   "tri1"
+|   "triand"
+|   "trior"
+|   "trireg"
+|   "unsigned"
+|   "use"
+|   "vectored"
+|   "wait"
+|   "wand"
+|   "weak0"
+|   "weak1"
+|   "while"
+|   "wire"
+|   "wor"
+|   "xnor"
+|   "xor";
+
+operators:
+    operators operator { DBMSG("scan operator: N/A");} | {};
+
+operator:
+    ARITHMETIC_R_SHIFT
+|   ARITHMETIC_L_SHIFT
+|   CASE_EQUAL
+|   CASE_INEQUAL
+|   LOGIC_R_SHIFT
+|   LOGIC_L_SHIFT
+|   LOGIC_AND
+|   LOGIC_OR
+|   LOGIC_EQUAL
+|   LOGIC_INEQUAL
+|   POWER
+|   QUESTION_MARK
+|   REDUCTION_NOR
+|   TILDE_HAT
+|   REDUCTION_NAND
+|   HAT_TILDE
+|   GREATER_EQUAL
+|   LESS_EQUAL
+|   COLON
+|   SEMICOLON
+|   GREATER
+|   LESS
+|   HAT
+|   BITWISE_OR
+|   BITWISE_AND
+|   CURLY_BRACKET_L
+|   CURLY_BRACKET_R
+|   SQUARE_BRACKET_L
+|   SQUARE_BRACKET_R
+|   BITWISE_NEG
+|   PLUS
+|   MINUS
+|   MUL
+|   DIV
+|   MOD
+|   LOGIC_NEG
+|   AT;
+
 
 %%
 

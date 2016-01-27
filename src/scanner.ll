@@ -147,7 +147,6 @@ loc.step();
     [\n]                /* FIXME: report an error of unterminated string */
 }
 
-
     /* keywords list */
 "always"                return yy::Parser::make_ALWAYS(loc);
 "and"                   return yy::Parser::make_AND(loc);
@@ -273,6 +272,44 @@ loc.step();
 "xnor"                  return yy::Parser::make_XNOR(loc);
 "xor"                   return yy::Parser::make_XOR(loc);
 
+    /* operator token list */
+">>>"                   return yy::Parser::make_ARITHMETIC_R_SHIFT(loc);
+"<<<"                   return yy::Parser::make_ARITHMETIC_L_SHIFT(loc);
+"==="                   return yy::Parser::make_CASE_EQUAL(loc);
+"!=="                   return yy::Parser::make_CASE_INEQUAL(loc);
+">>"                    return yy::Parser::make_LOGIC_R_SHIFT(loc);
+"<<"                    return yy::Parser::make_LOGIC_L_SHIFT(loc);
+"&&"                    return yy::Parser::make_LOGIC_AND(loc);
+"||"                    return yy::Parser::make_LOGIC_OR(loc);
+"=="                    return yy::Parser::make_LOGIC_EQUAL(loc);
+"!="                    return yy::Parser::make_LOGIC_INEQUAL(loc);
+"**"                    return yy::Parser::make_POWER(loc);
+"?"                     return yy::Parser::make_QUESTION_MARK(loc);
+"~|"                    return yy::Parser::make_REDUCTION_NOR(loc);
+"~^"                    return yy::Parser::make_TILDE_HAT(loc);
+"~&"                    return yy::Parser::make_REDUCTION_NAND(loc);
+"^~"                    return yy::Parser::make_HAT_TILDE(loc);
+">="                    return yy::Parser::make_GREATER_EQUAL(loc);
+"<="                    return yy::Parser::make_LESS_EQUAL(loc);
+":"                     return yy::Parser::make_COLON(loc);
+";"                     return yy::Parser::make_SEMICOLON(loc);
+">"                     return yy::Parser::make_GREATER(loc);
+"<"                     return yy::Parser::make_LESS(loc);
+"^"                     return yy::Parser::make_HAT(loc);
+"|"                     return yy::Parser::make_BITWISE_OR(loc);
+"&"                     return yy::Parser::make_BITWISE_AND(loc);
+"{"                     return yy::Parser::make_CURLY_BRACKET_L(loc);
+"}"                     return yy::Parser::make_CURLY_BRACKET_R(loc);
+"["                     return yy::Parser::make_SQUARE_BRACKET_L(loc);
+"]"                     return yy::Parser::make_SQUARE_BRACKET_R(loc);
+"~"                     return yy::Parser::make_BITWISE_NEG(loc);
+"+"                     return yy::Parser::make_PLUS(loc);
+"-"                     return yy::Parser::make_MINUS(loc);
+"*"                     return yy::Parser::make_MUL(loc);
+"/"                     return yy::Parser::make_DIV(loc);
+"%"                     return yy::Parser::make_MOD(loc);
+"!"                     return yy::Parser::make_LOGIC_NEG(loc);
+"@"                     return yy::Parser::make_AT(loc);
 
 {id}        {
                 DBMSG("scan id: " << std::string(yytext));
