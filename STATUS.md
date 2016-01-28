@@ -17,6 +17,7 @@ Scanner
     - [x] 2.7.2 Generated identifiers
     - [x] 2.7.3 Keywords
 - [ ] 2.8 Attributes
+- [x] 19 Compiler directives
 
 > This bulleted list is constructed by extracting titles of sections and 
 > sub-sections of chapter No.2 in "IEEE Std 1362-2001" 

@@ -205,6 +205,26 @@ LOGIC_NEG           "!"
 AT                  "@"
 ;
 
+/* compier directives list */
+%token
+_CELLDEFINE          "`celldefine"
+_DEFAULT_NETTYPE     "`default_nettype"
+_DEFINE              "`define"
+_ELSE                "`else"
+_ELSIF               "`elsif"
+_ENDCELLDEFINE       "`endcelldefine"
+_ENDIF               "`endif"
+_IFDEF               "`ifdef"
+_IFNDEF              "`ifndef"
+_INCLUDE             "`include"
+_LINE                "`line"
+_NOUNCONNECTED_DRIVE "`nounconnected_drive"
+_RESETALL            "`resetall"
+_TIMESCALE           "`timescale"
+_UNCONNECTED_DRIVE   "`unconnected_drive"
+_UNDEF               "`undef"
+;
+
 %token <std::string> IDENTIFIER "identifier" STRING "string"
 %token <std::string> NUMBER "number" /* FIXME: should not use std::string */
 
@@ -224,7 +244,8 @@ scanner_gnnng_test:
 |   strings {}
 |   numbers {}
 |   keywords {}
-|   operators {};
+|   operators {}
+|   compiler_directives {};
 
 ids:
     ids "identifier" {}|{};
@@ -271,6 +292,13 @@ operator:
 | CURLY_BRACKET_R | SQUARE_BRACKET_L | SQUARE_BRACKET_R | BITWISE_NEG | PLUS
 | MINUS | MUL | DIV | MOD | LOGIC_NEG | AT;
 
+compiler_directives:
+    compiler_directives compiler_directive { DBMSG("compiler_directive");} |;
+compiler_directive:
+    _CELLDEFINE | _DEFAULT_NETTYPE | _DEFINE | _ELSE | _ELSIF
+| _ENDCELLDEFINE | _ENDIF | _IFDEF | _IFNDEF | _INCLUDE | _LINE
+| _NOUNCONNECTED_DRIVE | _RESETALL | _TIMESCALE | _UNCONNECTED_DRIVE
+| _UNDEF;
 
 %%
 

@@ -311,6 +311,24 @@ loc.step();
 "!"                     return yy::Parser::make_LOGIC_NEG(loc);
 "@"                     return yy::Parser::make_AT(loc);
 
+    /* compiler directives */
+"`celldefine"           return yy::Parser::make__CELLDEFINE(loc);
+"`default_nettype"      return yy::Parser::make__DEFAULT_NETTYPE(loc);
+"`define"               return yy::Parser::make__DEFINE(loc);
+"`else"                 return yy::Parser::make__ELSE(loc);
+"`elsif"                return yy::Parser::make__ELSIF(loc);
+"`endcelldefine"        return yy::Parser::make__ENDCELLDEFINE(loc);
+"`endif"                return yy::Parser::make__ENDIF(loc);
+"`ifdef"                return yy::Parser::make__IFDEF(loc);
+"`ifndef"               return yy::Parser::make__IFNDEF(loc);
+"`include"              return yy::Parser::make__INCLUDE(loc);
+"`line"                 return yy::Parser::make__LINE(loc);
+"`nounconnected_drive"  return yy::Parser::make__NOUNCONNECTED_DRIVE(loc);
+"`resetall"             return yy::Parser::make__RESETALL(loc);
+"`timescale"            return yy::Parser::make__TIMESCALE(loc);
+"`unconnected_drive"    return yy::Parser::make__UNCONNECTED_DRIVE(loc);
+"`undef"                return yy::Parser::make__UNDEF(loc);
+
 {id}        {
                 DBMSG("scan id: " << std::string(yytext));
                 return yy::Parser::make_IDENTIFIER(yytext, loc);
