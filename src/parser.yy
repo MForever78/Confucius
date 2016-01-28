@@ -203,6 +203,7 @@ DIV                 "/"
 MOD                 "%"
 LOGIC_NEG           "!"
 AT                  "@"
+HASH                "#"
 ;
 
 /* compier directives list */

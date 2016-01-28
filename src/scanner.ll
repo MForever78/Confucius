@@ -302,6 +302,7 @@ loc.step();
 "%"                     return yy::Parser::make_MOD(loc);
 "!"                     return yy::Parser::make_LOGIC_NEG(loc);
 "@"                     return yy::Parser::make_AT(loc);
+"#"                     return yy::Parser::make_HASH(loc);
 
     /* compiler directives */
 "`celldefine"           return yy::Parser::make__CELLDEFINE(loc);
