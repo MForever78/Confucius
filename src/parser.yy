@@ -204,6 +204,7 @@ MOD                 "%"
 LOGIC_NEG           "!"
 AT                  "@"
 HASH                "#"
+DOT                 "."
 ;
 
 /* compier directives list */
