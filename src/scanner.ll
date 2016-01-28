@@ -127,18 +127,10 @@ loc.step();
 [\n]+                   loc.lines(yyleng); loc.step();
 
     /* string literal */
-<INITIAL>{quote}        {
-                            BEGIN(STRING);
-                            str_literal = "";
-                            /*DBMSG("enter string literal");*/
-                            /*DBVAR(yytext);*/
-                        }
+<INITIAL>{quote}        BEGIN(STRING); str_literal = "";
 <STRING>{
     {quote}             {
-                            BEGIN(INITIAL);
-                            loc.step();
-                            /*DBMSG("leave string literal");*/
-                            DBMSG("scan string: \"" << str_literal << "\"");
+                            BEGIN(INITIAL); loc.step();
                             return yy::Parser::make_STRING(str_literal, loc);
                         }
     "\\"[nt\\\x22]      str_literal += yytext; /* escaped \n \t \\ \" */
@@ -329,21 +321,13 @@ loc.step();
 "`unconnected_drive"    return yy::Parser::make__UNCONNECTED_DRIVE(loc);
 "`undef"                return yy::Parser::make__UNDEF(loc);
 
-{id}        {
-                DBMSG("scan id: " << std::string(yytext));
-                return yy::Parser::make_IDENTIFIER(yytext, loc);
-            }
+{id}                    return yy::Parser::make_IDENTIFIER(yytext, loc);
 
-{number}  {
-                /* FIXME: should return an new symbol type of number*/
-                DBMSG("scan number: " << yytext);
-                return yy::Parser::make_NUMBER(yytext, loc);
-            }
+{number}                return yy::Parser::make_NUMBER(yytext, loc);
+    /* FIXME: number should return an new symbol type of number*/
 
-.               DBMSG("scan invalid character: " << yytext);
-<<EOF>>     {
-                return yy::Parser::make_EOF(loc);
-            }
+.                       DBMSG("scan invalid character: " << yytext);
+<<EOF>>                 return yy::Parser::make_EOF(loc);
 %%
 
 void Driver::scan_begin() {

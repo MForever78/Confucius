@@ -248,13 +248,13 @@ scanner_gnnng_test:
 |   compiler_directives {};
 
 ids:
-    ids "identifier" {}|{};
+    ids "identifier" { DBMSG("scan id: " << $2);}|{};
 
 strings:
-    strings "string" {}|{};
+    strings "string" { DBMSG("scan string: \"" << $2 << "\"");}|{};
 
 numbers:
-    numbers "number" {}|{};
+    numbers "number" { DBMSG("scan number: " << $2);}|{};
 
 keywords:
     keywords keyword { DBMSG("scan keyword: N/A");} | {};
