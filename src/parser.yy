@@ -162,7 +162,6 @@ WIRE                "wire"
 WOR                 "wor"
 XNOR                "xnor"
 XOR                 "xor"
-;
 
 /* operators token list - sorted by length */
 %token
@@ -205,7 +204,6 @@ LOGIC_NEG           "!"
 AT                  "@"
 HASH                "#"
 DOT                 "."
-;
 
 /* compier directives list */
 %token
@@ -225,7 +223,6 @@ _RESETALL            "`resetall"
 _TIMESCALE           "`timescale"
 _UNCONNECTED_DRIVE   "`unconnected_drive"
 _UNDEF               "`undef"
-;
 
 %token <std::string> SIMPLE_IDENTIFIER "simple_identifier" STRING "string"
 %token <std::string> NUMBER "number" /* FIXME: should not use std::string */
