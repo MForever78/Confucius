@@ -87,7 +87,7 @@ quote       "\""
 
 /* identifiers */
 /* TODO: maximum length of identifiers is 1024 characters */
-id          [a-z_A-Z][a-z_$A-Z0-9]*
+simple_id          [a-z_A-Z][a-z_$A-Z0-9]*
 
 /* keyword */
 /* TODO: insert the keyword list */
@@ -323,7 +323,7 @@ loc.step();
 "`unconnected_drive"    return yy::Parser::make__UNCONNECTED_DRIVE(loc);
 "`undef"                return yy::Parser::make__UNDEF(loc);
 
-{id}                    return yy::Parser::make_IDENTIFIER(yytext, loc);
+{simple_id}          return yy::Parser::make_SIMPLE_IDENTIFIER(yytext, loc);
 
 {number}                return yy::Parser::make_NUMBER(yytext, loc);
     /* FIXME: number should return an new symbol type of number*/

@@ -227,7 +227,7 @@ _UNCONNECTED_DRIVE   "`unconnected_drive"
 _UNDEF               "`undef"
 ;
 
-%token <std::string> IDENTIFIER "identifier" STRING "string"
+%token <std::string> SIMPLE_IDENTIFIER "simple_identifier" STRING "string"
 %token <std::string> NUMBER "number" /* FIXME: should not use std::string */
 
 
