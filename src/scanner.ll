@@ -63,19 +63,20 @@ size        {sign}?{pos_number}
 /* TODO: the original rule in the std 2001 may be wrong, which is
 size        {pos_number}
 */ 
+dec_number_others   {size}?{dec_base}{ws}*{uns_number}|{size}?{dec_base}{ws}*{x_digit}[_]*|{size}?{dec_base}{ws}*{z_digit}[_]*
+/* TODO: could we wrap this line under the flex grammar? */
 
 hex_number  {size}?{hex_base}{ws}*{hex_value}
 oct_number  {size}?{oct_base}{ws}*{oct_value}
 bin_number  {size}?{bin_base}{ws}*{bin_value}
-dec_number  {uns_number}|{size}?{dec_base}{ws}*{uns_number}|{size}?{dec_base}{ws}*{x_digit}[_]*|{size}?{dec_base}{ws}*{z_digit}[_]*
-/* TODO: could we wrap this line under the flex grammar? */
+/*dec_number  {uns_number}|{dec_number_others}*/
 
 
 exp_digit   [eE]
 real_number {uns_number}"."{uns_number}|{uns_number}("."{uns_number})?{exp_digit}{sign}?{uns_number}
 /* TODO: same with last todo, about wrapping */
 
-number      {dec_number}|{oct_number}|{bin_number}|{hex_number}|{real_number}
+/*number {dec_number}|{oct_number}|{bin_number}|{hex_number}|{real_number}*/
 
 /* strings */
 /* TODO: can not simply use definition */
@@ -323,9 +324,14 @@ loc.step();
 "`unconnected_drive"    return yy::Parser::make__UNCONNECTED_DRIVE(loc);
 "`undef"                return yy::Parser::make__UNDEF(loc);
 
-{simple_id}          return yy::Parser::make_SIMPLE_IDENTIFIER(yytext, loc);
+{simple_id}         return yy::Parser::make_SIMPLE_IDENTIFIER(yytext, loc);
 
-{number}                return yy::Parser::make_NUMBER(yytext, loc);
+{bin_number}        return yy::Parser::make_BINARY_NUMBER(yytext, loc);
+{oct_number}        return yy::Parser::make_OCTAL_NUMBER(yytext, loc);
+{hex_number}        return yy::Parser::make_HEX_NUMBER(yytext, loc);
+{real_number}       return yy::Parser::make_REAL_NUMBER(yytext, loc);
+{uns_number}        return yy::Parser::make_UNSIGNED_NUMBER(yytext, loc);
+{dec_number_others} return yy::Parser::make_DECIMAL_NUMBER_OTHERS(yytext,loc);
     /* FIXME: number should return an new symbol type of number*/
 
 .                       DBMSG("scan invalid character: " << yytext);

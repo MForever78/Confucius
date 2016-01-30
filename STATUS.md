@@ -25,3 +25,5 @@ Scanner
 Parser
 ------
 
+To find out supporting status, see comments in `parser.yy`
+
