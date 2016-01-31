@@ -1,0 +1,43 @@
+// Unsized constant numbers
+1 2 3
+123 1234 12345
+659
+'h837FF
+'o7460
+//4af invalid
+
+// Sized constant numbers
+4'b1001
+5'D 3
+3'b01x
+12'hx
+16'hz
+
+// Using sign with constant numbers
+//8'd -6 invalid
+-8'd 6
+4'shf
+-4'sd15
+
+// Using underscaoe character in numbers
+27_105_000
+16'b0011_0101_0001_1111
+32'h 12ab_f001
+
+// real constants
+1.2
+0.1
+2394.2631
+1.2E12
+1.30e-2
+0.1e-0
+23E10
+29E-2
+236.123_763_e-12
+
+// Invalid real constants
+// .12
+// 9.
+// 4.e3
+// .2E-8
+

@@ -1,0 +1,7 @@
+"string"
+"a string"
+"escaped \t" "escaped \n" "escaped \"" "escaped \\"
+"escaped \\\\\\\t\t\n\n\"\""
+"escaped \0" "escaped \00" "escaped \000"
+"escaped \777" "escaped \77" "escaped \7"
+"escaped \000\001\002\003\004\005\006\007\010"

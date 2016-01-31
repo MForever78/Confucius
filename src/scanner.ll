@@ -19,7 +19,6 @@ static yy::location loc;
 
 /* white space */
 ws          [ \t]
-/* TODO: watch out white spaces in string literals */
 
 /* comments */
 /* sc = single-line comment, bc = block comment */
@@ -28,56 +27,68 @@ bcstart     "/*"
 bcend       "*/"
 %x COMMENT
 
-/* operators */
-/* TODO: maybe no need to define operators here, however in Rule Section */
+/* operators - see in Rules Section */
 
 /* numbers */
-/* TODO: not consider the situation that white space is embedded in number */
 z_digit     [zZ?]
 x_digit     [xX]
 
 hex_digit   {x_digit}|{z_digit}|[0-9a-fA-F]
 oct_digit   {x_digit}|{z_digit}|[0-7]
-bin_digit   {x_digit}|{z_digit||[0-1]
+bin_digit   {x_digit}|{z_digit}|[0-1]
 dec_digit   [0-9]
-dec_digit_pos   [1-9] /* positive digit */
+dec_digit_pos   [1-9]
 
 hex_base    "'"[sS]?[hH]
 oct_base    "'"[sS]?[oO]
 bin_base    "'"[sS]?[bB]
 dec_base    "'"[sS]?[dD]
 
-hex_value   {hex_digit}(_|{hex_digit})+
-oct_value   {oct_digit}(_|{oct_digit})+
-bin_value   {bin_digit}(_|{bin_digit})+
-dec_value   {dec_digit}(_|{dec_digit})+
+hex_value   {hex_digit}(_|{hex_digit})*
+oct_value   {oct_digit}(_|{oct_digit})*
+bin_value   {bin_digit}(_|{bin_digit})*
+dec_value   {dec_digit}(_|{dec_digit})*
 
 /* unsigned number and non-zero unsigned number */
-uns_number  {dec_digit}(_|dec_digit)+
-pos_number  {dec_digit_pos}(_|dec_digit)+
+uns_number  {dec_digit}(_|{dec_digit})*
+pos_number  {dec_digit_pos}{dec_digit}*
+/*  TODO: the original rule in the std 2001 may be wrong, which is
+pos_number  {dec_digit_pos}(_|{dec_digit})* 
 
-size        {pos_number}
+There shall not be any '_' in pos_number, which would be used in size constant
+*/
+
 sign        [+-]
-
-hex_number  {size}?{hex_base}{hex_value}
-oct_number  {size}?{oct_base}{oct_value}
-bin_number  {size}?{bin_base}{bin_value}
-dec_number  {uns_number}|{size}?{dec_base}{uns_number}|{size}?{dec_base}{x_digit}[_]*|{size}?{dec_base}{z_digit}[_]*
+size        {sign}?{pos_number}
+/* TODO: the original rule in the std 2001 may be wrong, which is
+size        {pos_number}
+*/ 
+dec_number_others   {size}?{dec_base}{ws}*{uns_number}|{size}?{dec_base}{ws}*{x_digit}[_]*|{size}?{dec_base}{ws}*{z_digit}[_]*
 /* TODO: could we wrap this line under the flex grammar? */
+
+hex_number  {size}?{hex_base}{ws}*{hex_value}
+oct_number  {size}?{oct_base}{ws}*{oct_value}
+bin_number  {size}?{bin_base}{ws}*{bin_value}
+/*dec_number  {uns_number}|{dec_number_others}*/
 
 
 exp_digit   [eE]
 real_number {uns_number}"."{uns_number}|{uns_number}("."{uns_number})?{exp_digit}{sign}?{uns_number}
 /* TODO: same with last todo, about wrapping */
 
-number      {dec_number}|{oct_number}|{bin_number}|{hex_number}|{real_number}
+/*number {dec_number}|{oct_number}|{bin_number}|{hex_number}|{real_number}*/
 
 /* strings */
 /* TODO: can not simply use definition */
+%{
+std::string str_literal;
+%}
+quote       "\""
+%x STRING
 
 /* identifiers */
 /* TODO: maximum length of identifiers is 1024 characters */
-id          [a-z_A-Z][a-z_$A-Z0-9]*
+simple_id          [a-z_A-Z][a-z_$A-Z0-9]*
 
 /* keyword */
 /* TODO: insert the keyword list */
@@ -116,7 +127,20 @@ loc.step();
 {ws}+                   loc.step();
 [\n]+                   loc.lines(yyleng); loc.step();
 
-                        /* keywords list */
+    /* string literal */
+<INITIAL>{quote}        BEGIN(STRING); str_literal = "";
+<STRING>{
+    {quote}             {
+                            BEGIN(INITIAL); loc.step();
+                            return yy::Parser::make_STRING(str_literal, loc);
+                        }
+    "\\"[nt\\\x22]      str_literal += yytext; /* escaped \n \t \\ \" */
+    "\\"[0-7]{1,3}      str_literal += yytext; /* escaped \o \oo \ooo */
+    [^\n\\\x22]*        str_literal += yytext; /* not one of \n, \\, \" */
+    [\n]                /* FIXME: report an error of unterminated string */
+}
+
+    /* keywords list */
 "always"                return yy::Parser::make_ALWAYS(loc);
 "and"                   return yy::Parser::make_AND(loc);
 "assign"                return yy::Parser::make_ASSIGN(loc);
@@ -241,15 +265,77 @@ loc.step();
 "xnor"                  return yy::Parser::make_XNOR(loc);
 "xor"                   return yy::Parser::make_XOR(loc);
 
+    /* operator token list */
+">>>"                   return yy::Parser::make_ARITHMETIC_R_SHIFT(loc);
+"<<<"                   return yy::Parser::make_ARITHMETIC_L_SHIFT(loc);
+"==="                   return yy::Parser::make_CASE_EQUAL(loc);
+"!=="                   return yy::Parser::make_CASE_INEQUAL(loc);
+">>"                    return yy::Parser::make_LOGIC_R_SHIFT(loc);
+"<<"                    return yy::Parser::make_LOGIC_L_SHIFT(loc);
+"&&"                    return yy::Parser::make_LOGIC_AND(loc);
+"||"                    return yy::Parser::make_LOGIC_OR(loc);
+"=="                    return yy::Parser::make_LOGIC_EQUAL(loc);
+"!="                    return yy::Parser::make_LOGIC_INEQUAL(loc);
+"**"                    return yy::Parser::make_POWER(loc);
+"?"                     return yy::Parser::make_QUESTION_MARK(loc);
+"~|"                    return yy::Parser::make_REDUCTION_NOR(loc);
+"~^"                    return yy::Parser::make_TILDE_HAT(loc);
+"~&"                    return yy::Parser::make_REDUCTION_NAND(loc);
+"^~"                    return yy::Parser::make_HAT_TILDE(loc);
+">="                    return yy::Parser::make_GREATER_EQUAL(loc);
+"<="                    return yy::Parser::make_LESS_EQUAL(loc);
+":"                     return yy::Parser::make_COLON(loc);
+";"                     return yy::Parser::make_SEMICOLON(loc);
+">"                     return yy::Parser::make_GREATER(loc);
+"<"                     return yy::Parser::make_LESS(loc);
+"^"                     return yy::Parser::make_HAT(loc);
+"|"                     return yy::Parser::make_BITWISE_OR(loc);
+"&"                     return yy::Parser::make_BITWISE_AND(loc);
+"{"                     return yy::Parser::make_CURLY_BRACKET_L(loc);
+"}"                     return yy::Parser::make_CURLY_BRACKET_R(loc);
+"["                     return yy::Parser::make_SQUARE_BRACKET_L(loc);
+"]"                     return yy::Parser::make_SQUARE_BRACKET_R(loc);
+"~"                     return yy::Parser::make_BITWISE_NEG(loc);
+"+"                     return yy::Parser::make_PLUS(loc);
+"-"                     return yy::Parser::make_MINUS(loc);
+"*"                     return yy::Parser::make_MUL(loc);
+"/"                     return yy::Parser::make_DIV(loc);
+"%"                     return yy::Parser::make_MOD(loc);
+"!"                     return yy::Parser::make_LOGIC_NEG(loc);
+"@"                     return yy::Parser::make_AT(loc);
+"#"                     return yy::Parser::make_HASH(loc);
+"."                     return yy::Parser::make_DOT(loc);
 
-{id}        {
-                DBMSG("scan id: " << std::string(yytext));
-                return yy::Parser::make_IDENTIFIER(yytext, loc);
-            }
+    /* compiler directives */
+"`celldefine"           return yy::Parser::make__CELLDEFINE(loc);
+"`default_nettype"      return yy::Parser::make__DEFAULT_NETTYPE(loc);
+"`define"               return yy::Parser::make__DEFINE(loc);
+"`else"                 return yy::Parser::make__ELSE(loc);
+"`elsif"                return yy::Parser::make__ELSIF(loc);
+"`endcelldefine"        return yy::Parser::make__ENDCELLDEFINE(loc);
+"`endif"                return yy::Parser::make__ENDIF(loc);
+"`ifdef"                return yy::Parser::make__IFDEF(loc);
+"`ifndef"               return yy::Parser::make__IFNDEF(loc);
+"`include"              return yy::Parser::make__INCLUDE(loc);
+"`line"                 return yy::Parser::make__LINE(loc);
+"`nounconnected_drive"  return yy::Parser::make__NOUNCONNECTED_DRIVE(loc);
+"`resetall"             return yy::Parser::make__RESETALL(loc);
+"`timescale"            return yy::Parser::make__TIMESCALE(loc);
+"`unconnected_drive"    return yy::Parser::make__UNCONNECTED_DRIVE(loc);
+"`undef"                return yy::Parser::make__UNDEF(loc);
 
-<<EOF>>     {
-                return yy::Parser::make_EOF(loc);
-            }
+{simple_id}         return yy::Parser::make_SIMPLE_IDENTIFIER(yytext, loc);
+
+{bin_number}        return yy::Parser::make_BINARY_NUMBER(yytext, loc);
+{oct_number}        return yy::Parser::make_OCTAL_NUMBER(yytext, loc);
+{hex_number}        return yy::Parser::make_HEX_NUMBER(yytext, loc);
+{real_number}       return yy::Parser::make_REAL_NUMBER(yytext, loc);
+{uns_number}        return yy::Parser::make_UNSIGNED_NUMBER(yytext, loc);
+{dec_number_others} return yy::Parser::make_DECIMAL_NUMBER_OTHERS(yytext,loc);
+    /* FIXME: number should return an new symbol type of number*/
+
+.                       DBMSG("scan invalid character: " << yytext);
+<<EOF>>                 return yy::Parser::make_EOF(loc);
 %%
 
 void Driver::scan_begin() {
