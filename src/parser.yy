@@ -33,6 +33,10 @@ class Driver;
 #include "driver.hpp"
 }
 
+%{
+#define YYDEBUG 1
+%}
+
 %define api.token.prefix {TOK_}
 
 %token  EOF     0   "end of file"
